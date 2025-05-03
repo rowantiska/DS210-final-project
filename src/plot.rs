@@ -29,7 +29,7 @@ pub fn plot_degree_distribution(distribution: &HashMap<usize, usize>, output_pat
         .y_desc("# of nodes")
         .draw()?;
 
-    chart.draw_series(
+    let _ = chart.draw_series(
         degrees.into_iter().map(|(degree, count)| {
             Circle::new((degree, count), 4, RED.filled())
         })

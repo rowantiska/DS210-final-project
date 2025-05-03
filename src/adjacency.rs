@@ -43,37 +43,22 @@ impl LoanGraph {
     pub fn build_from_data(data: &[LoanRecord]) -> Self {
         let mut graph = LoanGraph::new();
 
-        // Thresholds for similarity
-        let credit_score_threshold = 75;
-        let emp_exp_threshold = 4.0;  
-
         for (i, a) in data.iter().enumerate() {
             for (j, b) in data.iter().enumerate().skip(i + 1) {
-                if let (Some(a_credit), Some(b_credit), Some(a_exp), Some(b_exp)) = (
-                    a.credit_score,
-                    b.credit_score,
-                    a.person_emp_exp,
-                    b.person_emp_exp,
-                ) {
-                    if (a_credit as i32 - b_credit as i32).abs() <= credit_score_threshold
-                        && (a_exp - b_exp).abs() <= emp_exp_threshold
-                    {
-                        graph
-                            .adjacency_list
-                            .entry(i as u32)
-                            .or_insert_with(HashSet::new)
-                            .insert(j as u32);
-                        graph
-                            .adjacency_list
-                            .entry(j as u32)
-                            .or_insert_with(HashSet::new)
-                            .insert(i as u32);
-                    }
+                //if person (A&B) has same education or person (A&B) same loan intent -> add to adj list
+                if a.person_education == b.person_education || a.loan_intent == b.loan_intent {
+                    graph.adjacency_list
+                        .entry(i as u32)
+                        .or_insert_with(HashSet::new)
+                        .insert(j as u32);
+                    graph.adjacency_list
+                        .entry(j as u32)
+                        .or_insert_with(HashSet::new)
+                        .insert(i as u32);
                 }
             }
         }
-
-        graph
+        return graph;
     }
 
     // calculates the degree distribution from the LoanGraph graph

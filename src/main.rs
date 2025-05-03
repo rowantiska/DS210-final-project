@@ -1,6 +1,6 @@
 mod adjacency;
 mod plot;
-use adjacency::{read_loans, LoanGraph};
+use adjacency::{read_loans, LoanGraph, LoanRecord};
 use plot::plot_degree_distribution;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -28,37 +28,38 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_build_graph_connects_shared_education() {
+    // check to see if adjacency list is being calculated correctly (build_from_data function)
+    fn test_build_graph() {
         let records = vec![
             LoanRecord {
-                person_age: Some(30),
+                person_age: Some(25),
                 person_gender: "M".into(),
                 person_education: "Bachelors".into(),
-                person_income: Some(50000.0),
+                person_income: Some(80000.0),
                 person_emp_exp: Some(5.0),
                 person_home_ownership: "RENT".into(),
-                loan_amnt: Some(2000.0),
+                loan_amnt: Some(20000.0),
                 loan_intent: "DEBTCONSOLIDATION".into(),
-                loan_int_rate: Some(13.5),
-                loan_percent_income: Some(0.04),
+                loan_int_rate: Some(11.5),
+                loan_percent_income: Some(0.25),
                 cb_person_cred_hist_length: Some(4),
-                credit_score: Some(700),
+                credit_score: Some(730),
                 previous_loan_defaults_on_file: Some(0),
                 loan_status: Some(0),
             },
             LoanRecord {
-                person_age: Some(28),
+                person_age: Some(32),
                 person_gender: "F".into(),
-                person_education: "Bachelors".into(), // same education
-                person_income: Some(40000.0),
+                person_education: "Bachelors".into(), // same education level (should be connected)
+                person_income: Some(62000.0),
                 person_emp_exp: Some(3.0),
-                person_home_ownership: "MORTGAGE".into(),
-                loan_amnt: Some(3000.0),
+                person_home_ownership: "RENT".into(),
+                loan_amnt: Some(5200.0),
                 loan_intent: "EDUCATION".into(),
-                loan_int_rate: Some(12.0),
-                loan_percent_income: Some(0.075),
+                loan_int_rate: Some(10.50),
+                loan_percent_income: Some(0.084),
                 cb_person_cred_hist_length: Some(5),
-                credit_score: Some(720),
+                credit_score: Some(690),
                 previous_loan_defaults_on_file: Some(0),
                 loan_status: Some(1),
             },
@@ -71,15 +72,16 @@ mod tests {
     }
 
     #[test]
-    fn test_degree_distribution_correctness() {
-        // 3 nodes all connected to each other (triangle)
+    // check to see if degree distrubtion is calculating correctly (compute_degree_distribution function)
+    fn test_degree_distribution() {
+        // 3 test nodes, all should be connected
         let mut graph = LoanGraph::new();
         graph.adjacency_list.insert(0, [1, 2].iter().cloned().collect());
         graph.adjacency_list.insert(1, [0, 2].iter().cloned().collect());
         graph.adjacency_list.insert(2, [0, 1].iter().cloned().collect());
 
         let dist = graph.compute_degree_distribution();
-        assert_eq!(dist.len(), 1); // All nodes have same degree
-        assert_eq!(dist[&2], 3);   // 3 nodes with degree 2
+        assert_eq!(dist.len(), 1); // all nodes should have the same degree of connection
+        assert_eq!(dist[&2], 3);   // 3 total nodes with 2 degree
     }
 }
