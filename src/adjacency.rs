@@ -73,7 +73,6 @@ impl LoanGraph {
             let degree = neighbors.len();
             *distribution.entry(degree).or_insert(0) += 1;
         }
-
         return distribution;
     }
 }
